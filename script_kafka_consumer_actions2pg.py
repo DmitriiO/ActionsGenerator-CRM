@@ -28,16 +28,13 @@ def load_topic_kafka_to_GP():
     try:
         conn = pg8000.connect(database=target_db, user=user, password=password, host=host, port=port)
         cursor = conn.cursor()
-
+        print('Connection PG - ok!')        
+    
     except Exception as e:
 
         print(f'Ошибка подключения к {target_db}: {str(e)}')
-        #  Выход из скрипта при ошибке подключения к БД
-        sys.exit()
-
-    else:
-	    print('Connection PG - ok!')
-
+    
+    else:    
         # Создание kafka consumer
         consumer = KafkaConsumer(
             topic_name,
@@ -47,47 +44,78 @@ def load_topic_kafka_to_GP():
             enable_auto_commit=enable_auto_commit,
             auto_commit_interval_ms=auto_commit_interval_ms
         )
-
+        query_count = 0
+        
         for transaction in consumer:
-                # Получение данных из сообщения и парсинг JSON
-                data = json.loads(transaction.value.decode('utf-8'))
-                bot = topic_name
-                user_id = data['user_id']
-                date = data['date']
-                filial = data['filial']
-                week = data['week']
-                text1 = data['text1']
-                text2 = data['text2']
-                text3 = data['text3']
-                text4 = data['text4']
-                text5 = data['text5']
-                text6 = data['text6']
-                text7 = data['text7']
-                text8 = data['text8']
-                text9 = data['text9']
-                text10 = data['text10']
-                text11 = data['text11']
-                text12 = data['text12']
-                text13 = data['text13']
-                text14 = data['text14']
-                text15 = data['text15']
 
-                # Вставка данных в таблицу, имя соответствует очереди
+                try:
+                    # Получение данных из сообщения и парсинг JSON
+                    data = json.loads(transaction.value.decode('utf-8'))
+                    bot = topic_name
+                    user_id = data['user_id']
+                    date = data['date']
+                    filial = data['filial']
+                    week = data['week']
+                    text1 = data['text1']
+                    text2 = data['text2']
+                    text3 = data['text3']
+                    text4 = data['text4']
+                    text5 = data['text5']
+                    text6 = data['text6']
+                    text7 = data['text7']
+                    text8 = data['text8']
+                    text9 = data['text9']
+                    text10 = data['text10']
+                    text11 = data['text11']
+                    text12 = data['text12']
+                    text13 = data['text13']
+                    text14 = data['text14']
+                    text15 = data['text15']
 
-                cursor.execute(insert_query, (bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15))
+                    # Вставка данных в таблицу, имя соответствует очереди сообщений
 
-                conn.commit()
+                    cursor.execute(insert_query, (bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15))
+                    
+                    query_count += 1
+                    
+                    if query_count >= 10: #Коммит после 10 запросов
+                        
+                        conn.commit()
+                        
+                        query_count = 0
+                        
+                    else:
+                        
+                        pass
 
-
+                except Exception as e:
+                    
+                    print(f'Ошибка обработки и/или сохранения сообщения: {str(e)}')
+                    
+                    conn.rollback()  # Откат транзакции в случае ошибки
+    
+    finally:
         # Закрытие соединения с Greenplum и Kafka Consumer
-
-        cursor.close()
-
-        conn.close()
-
-        consumer.close()
-        # Выход из скрипта
-        sys.exit()
-
+        if 'cursor' in locals() and cursor:
+            
+            cursor.close()
+        
+        if 'conn' in locals() and conn:
+            
+            conn.close()
+        
+        if 'consumer' in locals() and consumer:
+            
+            consumer.close()
+            
+def main():
+    # Проверка очереди сообщений каждые 2 минуты 
+    while True:
+        
+        load_topic_kafka_to_GP()
+        
+        time.sleep(120)
+            
+            
 if __name__ == "__main__":
-    load_topic_kafka_to_GP()
+    main()
