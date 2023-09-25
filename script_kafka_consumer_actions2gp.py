@@ -44,7 +44,6 @@ def load_topic_kafka_to_GP():
             enable_auto_commit=enable_auto_commit,
             auto_commit_interval_ms=auto_commit_interval_ms
         )
-        query_count = 0
         
         for transaction in consumer:
 
@@ -76,17 +75,7 @@ def load_topic_kafka_to_GP():
 
                     cursor.execute(insert_query, (bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15))
                     
-                    query_count += 1
-                    
-                    if query_count >= 10: #Коммит после 10 запросов
-                        
-                        conn.commit()
-                        
-                        query_count = 0
-                        
-                    else:
-                        
-                        pass
+                    conn.commit()
 
                 except Exception as e:
                     
