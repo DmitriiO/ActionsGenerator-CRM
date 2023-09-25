@@ -32,7 +32,7 @@ def load_topic_kafka_to_GP():
     
     except Exception as e:
 
-        print(f'Ошибка подключения к {target_db}: {str(e)}')
+        print(f'Ошибка подключения/чтения {target_db}: {str(e)}')
     
     else:    
         # Создание kafka consumer
