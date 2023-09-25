@@ -26,30 +26,30 @@ def read_and_send_data_to_kafka():
     # Получение последнего смещения из метаданных
         cursor.execute('SELECT last_transfer_timestamp FROM last_transfer_metadata')
         last_offset = cursor.fetchone()[0]
-    
+
     # Выбор новых транзакций со смещением больше last_offset
         cursor.execute('SELECT * FROM user_message WHERE date > ?', (last_offset,))
         new_transactions = cursor.fetchall()
-    
-    except:
-        
-        print(f'Ошибка подключения/чтения {target_db}')
-        
+
+    except Exception as e:
+
+        print(f'Ошибка подключения/чтения {target_db} {str(e)}')
+
         pass
-   
+
     else:
-        # Проверка на наличие новых данных
+	# Проверка на наличие новых данных
         if new_transactions != []:
-            
+
             print(f'Передается {len(new_transactions)} новых транзакций')
-            
+
             # Создание Kafka Producer
             producer = KafkaProducer(bootstrap_servers=bootstrap_servers, value_serializer=lambda v:json.dumps(v).encode('utf-8'))
-            
+
             # Отправка новых транзакций в Kafka в виде словаря по каждой отдельно
-            
+
             count_trs = 0
-            
+
             for transaction in new_transactions:
 
                 message = {
@@ -76,42 +76,42 @@ def read_and_send_data_to_kafka():
                 }
 
                 try:
-                    
+
                     producer.send(topic_name, value = message)
-                
-                except:
-                    
-                    print(f'Ошибка передачи сообщений в Kafka Producer')
-                    
+
+                except Exception as e:
+
+                    print(f'Ошибка передачи сообщений в Kafka Producer : {str(e)}')
+
                     pass
-                
-                else: 
+
+                else:
                     count_trs +=1
 
             # Обновление смещения в метаданных после отправки транзакций в kafka - timestamp последней в стриме транзакции
             cursor.execute('UPDATE last_transfer_metadata SET last_transfer_timestamp = ?', (transaction[2],))
+            
             conn.commit()
 
             # Закрытие Kafka Producer и соединения с базой данных
             producer.close()
-                    
-            print(f'{count_trs} новых транзакций чат-бота {topic_name} отсутствуют')
-        
+
+            print(f'{count_trs} новых транзакций чат-бота {topic_name} успешно переданы!')
+
         else:
             print(f'Новые транзакций в чат-бота {topic_name} отсутствуют')
-            
+
         # Закрытие соединения с базой данных
         conn.close()
 
 def main():
-    
+
     # Запуск проверок наличия новых транзакций с интервалом 5 минут
     while True:
-        
+
         read_and_send_data_to_kafka()
-        
+
         time.sleep(300)
-    
+
 if __name__ == "__main__":
     main()
-    
