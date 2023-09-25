@@ -36,7 +36,7 @@ def load_topic_kafka_to_GP():
         sys.exit()
 
     else:
-	print('Connection PG - ok!')
+	    print('Connection PG - ok!')
 
         # Создание kafka consumer
         consumer = KafkaConsumer(
@@ -48,7 +48,7 @@ def load_topic_kafka_to_GP():
             auto_commit_interval_ms=auto_commit_interval_ms
         )
 
-	for transaction in consumer:
+        for transaction in consumer:
                 # Получение данных из сообщения и парсинг JSON
                 data = json.loads(transaction.value.decode('utf-8'))
                 bot = topic_name
@@ -86,6 +86,8 @@ def load_topic_kafka_to_GP():
         conn.close()
 
         consumer.close()
+        # Выход из скрипта
+        sys.exit()
 
 if __name__ == "__main__":
     load_topic_kafka_to_GP()
