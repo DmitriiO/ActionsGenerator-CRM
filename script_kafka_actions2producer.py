@@ -3,17 +3,19 @@ import time
 import json
 import os
 import sqlite3
-from datetime import datetime, timedelta, date, time
+from datetime import datetime, timedelta, date
 import sys
 
-project_path='/usr/games/ActionsGenerator-CRM/'
+# project_path='/usr/games/ActionsGenerator-CRM/'
+project_path='/home/orlov-dv/ActionsGenerator-CRM/'
 
 os.chdir(project_path)
 
 # Тема Kafka для подписки (по умолчанию) название бота в каждом МРФ
-topic_name = 'crm_bot_actions_mrf1'
-
 target_db = 'actions.db'
+topic_name = 'crm_bot_actions_mrf1'
+bootstrap_servers='vm-strmng-s-1.test.local:9092'
+
 
 # Функция для чтения и отправки данных из SQLite в Kafka
 def read_and_send_data_to_kafka():
@@ -39,11 +41,15 @@ def read_and_send_data_to_kafka():
         # Проверка на наличие новых данных
         if new_transactions != []:
             
+            print(f'Передается {len(new_transactions)} новых транзакций')
+            
             # Создание Kafka Producer
-            producer = KafkaProducer(bootstrap_servers='vm-strmng-s-1.test.local:9092',
-                                     value_serializer=lambda v:json.dumps(v).encode('utf-8'))
+            producer = KafkaProducer(bootstrap_servers=bootstrap_servers, value_serializer=lambda v:json.dumps(v).encode('utf-8'))
             
             # Отправка новых транзакций в Kafka в виде словаря по каждой отдельно
+            
+            count_trs = 0
+            
             for transaction in new_transactions:
 
                 message = {
@@ -79,25 +85,27 @@ def read_and_send_data_to_kafka():
                     
                     pass
                 
-                else:
-                    # Обновление смещения в метаданных после отправки транзакций в kafka - timestamp последней в стриме транзакции
-                    cursor.execute('UPDATE last_transfer_metadata SET last_transfer_timestamp = ?', (transaction[2],))
-                    conn.commit()
+                else: 
+                    count_trs +=1
 
-                    # Закрытие Kafka Producer и соединения с базой данных
-                    producer.close()
+            # Обновление смещения в метаданных после отправки транзакций в kafka - timestamp последней в стриме транзакции
+            cursor.execute('UPDATE last_transfer_metadata SET last_transfer_timestamp = ?', (transaction[2],))
+            conn.commit()
+
+            # Закрытие Kafka Producer и соединения с базой данных
+            producer.close()
                     
-                    print(f'Новые транзакции чат-бота {topic_name} отправлены')
+            print(f'{count_trs} новых транзакций чат-бота {topic_name} отсутствуют')
         
         else:
-            print(f'Новые транзакции в БД чат-бота {topic_name} отсутствуют')
+            print(f'Новые транзакций в чат-бота {topic_name} отсутствуют')
             
         # Закрытие соединения с базой данных
         conn.close()
 
 def main():
-    # Запуск проверок наличия новых транзакций с интервалом 5 минут
     
+    # Запуск проверок наличия новых транзакций с интервалом 5 минут
     while True:
         
         read_and_send_data_to_kafka()
