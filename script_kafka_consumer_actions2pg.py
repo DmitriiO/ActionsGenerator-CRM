@@ -4,13 +4,6 @@ import json
 from datetime import datetime
 import sys
 
-# Настройка gодключения к базе данных GreenPlum
-target_db = 'postgres'
-user = 'orlovdv'
-password = 'qr559'
-host = '192.168.77.21'
-port = 5432
-
 # Настройка kafka consumer
 topic_name = 'crm_bot_actions_mrf1'
 bootstrap_servers='vm-strmng-s-1.test.local:9092'
@@ -19,6 +12,15 @@ auto_offset_reset = 'latest' # Начать чтение с момента ос�
 enable_auto_commit = True # Автоматически фиксировать смещение
 auto_commit_interval_ms = 1000 # Интервал автоматической фиксации смещения (1 секунда)
 
+# Настройка gодключения к базе данных GreenPlum
+target_db = 'postgres'
+user = 'orlovdv'
+password = 'qr559'
+host = '192.168.77.21'
+port = 5432
+table_name = topic_name
+insert_query = f"INSERT INTO {table_name}(bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                
 
 # Функция для чтения и отправки данных из Kafka в GP
 def load_topic_kafka_to_GP():
@@ -43,8 +45,6 @@ def load_topic_kafka_to_GP():
             auto_commit_interval_ms=auto_commit_interval_ms
         )
         
-        cursor = conn.cursor()
-
         for transaction in consumer:
                 # Получение данных из сообщения и парсинг JSON
                 data = json.loads(transaction.value.decode('utf-8'))
@@ -70,17 +70,21 @@ def load_topic_kafka_to_GP():
                 text15 = str(data['text15'])
 
                 # Вставка данных в таблицу, имя соответствует очереди сообщений
-                table_name = topic_name
-                insert_query = f"INSERT INTO {table_name}(bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                cursor.execute(insert_query, (bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15))    
-        
-        # Коммит после получения всех сообщений очереди
-        conn.commit()
+
+                try:
+                    with conn.cursor() as curs:
+                        
+                        curs.execute(insert_query, (bot, user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15))    
+                    # Коммит после каждой транзакции
+                        conn.commit()
+                except:
+                    
+                    print(f'Ошибка сохранения данных в GP {target_db}')
+                    
+                    conn.rollback()
 
     finally:
         # Закрытие соединения с Greenplum и Kafka Consumer
-        cursor.close()
-        
         conn.close()
         
         consumer.close()
