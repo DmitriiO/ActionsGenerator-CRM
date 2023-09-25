@@ -85,7 +85,7 @@ def read_and_send_data_to_kafka():
                 else:
                     count_trs +=1
                     
-                    print(f'{count_trs} новых транзакций чат-бота {topic_name} успешно переданы!')
+            print(f'{count_trs} новых транзакций чат-бота {topic_name} успешно переданы!')
 
             # Обновление смещения в метаданных после отправки транзакций в kafka - timestamp последней в стриме транзакции
             try:
