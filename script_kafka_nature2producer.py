@@ -23,6 +23,7 @@ def read_and_send_data_to_kafka():
     try:
         conn = sqlite3.connect(target_db)
         cursor = conn.cursor()
+        print('Connection SQLite - ok!')
     # Получение последнего смещения из метаданных
         cursor.execute('SELECT last_transfer_timestamp FROM last_transfer_metadata')
         last_offset = cursor.fetchone()[0]
@@ -34,8 +35,6 @@ def read_and_send_data_to_kafka():
     except Exception as e:
 
         print(f'Ошибка подключения/чтения {target_db} {str(e)}')
-
-        pass
 
     else:
 	# Проверка на наличие новых данных
@@ -83,26 +82,44 @@ def read_and_send_data_to_kafka():
 
                     print(f'Ошибка передачи сообщений в Kafka Producer : {str(e)}')
 
-                    pass
-
                 else:
                     count_trs +=1
+                    
+                    print(f'{count_trs} новых транзакций чат-бота {topic_name} успешно переданы!')
 
             # Обновление смещения в метаданных после отправки транзакций в kafka - timestamp последней в стриме транзакции
-            cursor.execute('UPDATE last_transfer_metadata SET last_transfer_timestamp = ?', (transaction[2],))
+            try:
+                cursor.execute('UPDATE last_transfer_metadata SET last_transfer_timestamp = ?', (transaction[2],))
             
-            conn.commit()
-
-            # Закрытие Kafka Producer и соединения с базой данных
-            producer.close()
-
-            print(f'{count_trs} новых транзакций чат-бота {topic_name} успешно переданы!')
+                conn.commit()
+            
+            except Exception as e:
+                    
+                print(f'Ошибка обработки и/или сохранения сообщения: {str(e)}')
+                    
+                conn.rollback()  # Откат транзакции в случае ошибки
+            
+            else:
+                
+                print(f'Сохранен timestamp последней в стриме транзакции: {transaction[2]}')
 
         else:
             print(f'Новые транзакций в чат-бота {topic_name} отсутствуют')
 
-        # Закрытие соединения с базой данных
-        conn.close()
+    
+    finally:
+        # Закрытие соединения с SQLite и Kafka Producer
+        if 'cursor' in locals() and cursor:
+            
+            cursor.close()
+        
+        if 'conn' in locals() and conn:
+            
+            conn.close()
+        
+        if 'consumer' in locals() and consumer:
+            
+            producer.close()
 
 def main():
 
