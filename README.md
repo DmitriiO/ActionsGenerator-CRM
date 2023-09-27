@@ -23,11 +23,11 @@ generator_bot.py - генерация фейковых данных в чат-б
 _Apache.Kafka_
 script_kafka_actions2producer.py - передача новых транзакций по активности в очередь
 script_kafka_nature2producer.py - передача новых транзакций по подключению услуг в очередь
+_GreenPlum_
+create GP table query.sql - скрипт создания таблиц в БД GreenPlum
 script_kafka_consumer_actions2gp.py - чтение очереди транзакций с активностями и сохранение в базу GP crm_bot_actions_mrf1
 script_kafka_cinsumer_nature2gp.py - чтение очереди транзакций по подключениям и сохранение в базу GP crm_bot_nature_mrf1
 
 _Apache.Airflow_
 dag_data2excel.py - выгрузка данных из 2-х таблиц с данными из БД GP и сохранение в Excel файлы /opt/airflow/dags/nature_mrf1.xlsx и /opt/airflow/dags/actions_mrf1.xlsx 
 
-
-create GP table query.sql - скрипт создания таблиц в БД GreenPlum
