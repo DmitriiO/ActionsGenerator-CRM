@@ -60,3 +60,28 @@ compresstype = zstd,
 compresslevel = 1
 )
 distributed randomly;
+
+# Создание представления таблицы в GP для подключения к SuperSet
+CREATE OR REPLACE VIEW crm_bot_nature_mrf1_view AS
+SELECT
+bot,
+user_id,
+date,
+cast(filial as numeric) as filial,
+week,
+text1,
+text2,
+text3,
+text4,
+text5,
+text6,
+CAST(text7 AS integer) AS text7,
+text8,
+text9,
+text10,
+CAST(text11 AS integer) AS text11,
+CAST(text12 AS integer) AS text12,
+text13,
+text14,
+text15
+FROM crm_bot_nature_mrf1;
