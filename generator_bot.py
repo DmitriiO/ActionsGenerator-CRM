@@ -14,25 +14,13 @@ import logging
 import time
 os.system('clear')
 
-
-# In[41]:
-
-
-project_path='/data/data/com.termux/files/home/storage/shared/de_project/'
+project_path=''
 os.chdir(project_path)
-
-
-# In[3]:
-
 
 # Логгирование с выводом в файл
 logging.basicConfig(level = logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s (Line: %(lineno)d)", filename='debug.log', filemode='w', encoding='UTF-8')
 logger = logging.getLogger(__name__)
 # print(logger.handlers)
-
-
-# In[4]:
-
 
 # Загрузка базы ИНН и формирование списка ИНН-Наименование клиента
 file = 'inn.csv'
@@ -42,15 +30,6 @@ with open(file) as f:
 
     for row in reader:
         inn_lst.append(list(row.values()))
-
-
-# In[5]:
-
-
-# df_all_inn.loc[df_all_inn.base =='B2B'][['INN', 'cl_name']].drop_duplicates().head(3000).to_csv('inn.csv', index = False)
-
-
-# In[6]:
 
 
 # Коннект с БД по активности
@@ -98,10 +77,6 @@ def check_inn(action_conn, text2: str, text8: str, nof: int):
     
     return c.fetchall()
 
-
-# In[7]:
-
-
 # Коннект с БД по подключениям
 def nature_connection(func):
     
@@ -140,22 +115,6 @@ def add_message_nature(nature_conn, user_id: int, date: str, filial: str, week: 
     c.execute("INSERT INTO user_message (user_id, date, filial, week, text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (user_id, date, filial, week, text1, text2, text3, text4,  text5,  text6,  text7,  text8,  text9,  text10, text11, text12, text13, text14, text15))
     nature_conn.commit()
 
-
-# In[ ]:
-
-
-# list1 = list(set([828798031, 456798031, 828798123, 534798031, 786798031, 986798031, 238798031,
-#          254798031,543235654, 456721234, 828798030, 452798031, 328798123, 444798031,
-#          666798031, 986798031, 648798031, 764798031, 993235654, 106721234, 554321432]))
-# list2 = ['Марина C.', 'Ольга В.', 'Илья И.', 'Николай Н.', 'Николай Д.', 'Николай К.', 'Владимир П.',
-#          'Владимир А.','Владимир Е.', 'Владимир Щ.', 'Андрей П.', 'Андрей О.', 'Андрей A.', 'Виктория С.',
-#          'Елена З.', 'Елена А.', 'Елена Р.', 'Александр К.', 'Ирина Э.', 'Анастасия В.']
-# list(zip(list1, list2))
-
-
-# In[46]:
-
-
 # Формирование списка менеджеров user_id + Имя + номер филиала
 
 users_lst = [(554321432, 'Марина C.', '1'),
@@ -181,9 +140,6 @@ users_lst = [(554321432, 'Марина C.', '1'),
               ]
 
 
-# In[10]:
-
-
 # Функция возвращает список месяцев, перенося текущий месяц на следующий год
 def calendar_buttons():
     
@@ -202,9 +158,6 @@ def calendar_buttons():
     lst_res_month.extend(lst_month_past)
     
     return lst_res_month
-
-
-# In[11]:
 
 
 # Генератор данных по активности
@@ -303,10 +256,6 @@ def generate_random_data_activity():
 
     return data
 
-
-# In[12]:
-
-
 def generate_random_data_sales():
     
 # Параметры для генерации данных по продажам
@@ -385,10 +334,6 @@ def generate_random_data_sales():
     } 
 
     return data
-
-
-# In[ ]:
-
 
 def main():
     
