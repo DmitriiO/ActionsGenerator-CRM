@@ -14,20 +14,37 @@
 
 Формирование витрин данных происходит с периодичностью, заданной в DAG файле AirFlow. Формат выходных данных excel файлы для каждого дашборда.
 
+___________________________________________________________________________________________________________________________________________________
 Уровень чат-бота:
+
 actions.db - база чат-бота с данными по активности (лидогенерация)
+
 nature.db - база чат-бота с данными по подключению услуг (конверсия)
+
 generator_bot.py - генерация фейковых данных в чат-боте
 
+
 Уровень ETL:
+
 _Apache.Kafka_
+
 script_kafka_actions2producer.py - передача новых транзакций по активности в очередь
+
 script_kafka_nature2producer.py - передача новых транзакций по подключению услуг в очередь
+
 _GreenPlum_
+
 create GP table query.sql - скрипт создания таблиц в БД GreenPlum
+
 script_kafka_consumer_actions2gp.py - чтение очереди транзакций с активностями и сохранение в базу GP crm_bot_actions_mrf1
+
 script_kafka_cinsumer_nature2gp.py - чтение очереди транзакций по подключениям и сохранение в базу GP crm_bot_nature_mrf1
 
 _Apache.Airflow_
-dag_data2excel.py - выгрузка данных из 2-х таблиц с данными из БД GP и сохранение в Excel файлы /opt/airflow/dags/nature_mrf1.xlsx и /opt/airflow/dags/actions_mrf1.xlsx 
+
+dag_data2excel.py - выгрузка данных из 2-х таблиц с данными из БД GP и сохранение в Excel файлы:
+
+  /opt/airflow/dags/nature_mrf1.xlsx
+
+  /opt/airflow/dags/actions_mrf1.xlsx
 
