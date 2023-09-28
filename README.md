@@ -1,3 +1,11 @@
+
+
+
+https://github.com/DmitriiO/ActionsGenerator-CRM/assets/37252057/14e58904-1292-49c0-935a-8fe9b20c1e8b
+
+
+
+
 1. Транспорт синтетических данных модели CRM бота со слоя хранения БД SQLite в распределенное хранилище данных БД GreenPlum.
 
 Описание:
