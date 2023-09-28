@@ -1,7 +1,8 @@
 
+*CRM Ассистент*
 
+https://github.com/DmitriiO/ActionsGenerator-CRM/assets/37252057/8c244f77-da9f-4946-840d-e2ae1ead1b6a
 
-https://github.com/DmitriiO/ActionsGenerator-CRM/assets/37252057/14e58904-1292-49c0-935a-8fe9b20c1e8b
 
 
 
