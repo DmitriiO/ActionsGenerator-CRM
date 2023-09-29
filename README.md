@@ -1,11 +1,3 @@
-
-**CRM Ассистент**
-
-https://github.com/DmitriiO/ActionsGenerator-CRM/assets/37252057/8c244f77-da9f-4946-840d-e2ae1ead1b6a
-
-
-
-
 **Решение**
 
 1. Транспорт синтетических данных модели CRM бота со слоя хранения БД SQLite в распределенное хранилище данных БД GreenPlum.
