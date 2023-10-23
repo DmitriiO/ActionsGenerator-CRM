@@ -15,7 +15,7 @@ auto_commit_interval_ms = 1000 # Интервал автоматической �
 # Настройка gодключения к базе данных GreenPlum
 target_db = 'postgres'
 user = 'orlovdv'
-password = 'qr559'
+password = '***'
 host = '192.168.77.21'
 port = 5432
 table_name = topic_name
