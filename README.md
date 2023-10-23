@@ -17,7 +17,7 @@
 Формирование витрин данных происходит с периодичностью, заданной в DAG файле AirFlow. Формат выходных данных excel файлы для каждого дашборда, а также дашборд в Superset
 
 ![Sales Dashboard NS](https://github.com/DmitriiO/ActionsGenerator-CRM/assets/37252057/633370ee-af78-42d7-bcf8-cd3bc73470bb)
-<video src='[your URL here](https://www.youtube.com/shorts/9bxbfaA2Vrw?si=3bGf1IdYJ2yIhNXx)' width=180/>
+<video src='https://www.youtube.com/shorts/9bxbfaA2Vrw?si=3bGf1IdYJ2yIhNXx' width=180/>
 ___________________________________________________________________________________________________________________________________________________
 Уровень чат-бота:
 
